@@ -22,9 +22,9 @@ type Price interface {
 // FormatPrice formats a price with currency
 func FormatPrice(price float32, currency string) string {
 	switch currency {
-	case "USD":
+	case CurrencyUSD:
 		return fmt.Sprintf("$%.4f", price)
-	case "EUR":
+	case CurrencyEUR:
 		return fmt.Sprintf("€%.4f", price)
 	default:
 		return fmt.Sprintf("%.4f", price)
@@ -33,55 +33,48 @@ func FormatPrice(price float32, currency string) string {
 
 // Pricing is a list of models with price
 type Pricing struct {
-	models          []Model
-	defaultCurrency string
-	currencyRates   map[string]float32
+	models    []Model
+	converter Converter
 }
 
 var _ Price = (*Pricing)(nil)
 
 // NewPricing returns a new pricing
-func NewPricing(models []Model, currencyRates map[string]float32) *Pricing {
+func NewPricing(models []Model, converter Converter) *Pricing {
 	return &Pricing{
-		models:        models,
-		currencyRates: currencyRates,
+		models:    models,
+		converter: converter,
 	}
 }
 
 // ForModelQuery returns the price for a model query
 func (p *Pricing) ForModelQuery(provider, model string, currency string, tokens int) (float32, error) {
-	for _, m := range p.models {
-		if m.Provider == provider && m.Model == model {
-			currencyRate, ok := p.currencyRates[currency]
-			if !ok {
-				return 0, fmt.Errorf("unknown currency %s", currency)
-			}
-
-			return m.PriceQuery * float32(tokens) * currencyRate, nil
-		}
-	}
-
-	return 0.0, fmt.Errorf("unknown model %s", model)
+	return p.forModel(provider, model, currency, tokens, func(m Model) float32 {
+		return m.PriceQuery
+	})
 }
 
 // ForModelOutput returns the price for a model output
 func (p *Pricing) ForModelOutput(provider, model string, currency string, tokens int) (float32, error) {
+	return p.forModel(provider, model, currency, tokens, func(m Model) float32 {
+		return m.PriceOutput
+	})
+}
+
+func (p *Pricing) forModel(provider, model string, userCurrency string, tokens int, pricePerTokenValueFunc func(Model) float32) (float32, error) {
 	for _, m := range p.models {
-		if m.Provider == provider && m.Model == model {
-			currencyRate, ok := p.currencyRates[m.Currency]
-			if !ok {
-				return 0, fmt.Errorf("unknown model currency: %s", currency)
-			}
-
-			originalPrice := m.PriceOutput * float32(tokens) * currencyRate
-
-			currencyRate, ok = p.currencyRates[currency]
-			if !ok {
-				return 0, fmt.Errorf("unknown currency: %s", currency)
-			}
-
-			return originalPrice / currencyRate, nil
+		if m.Provider != provider || m.Model != model {
+			continue
 		}
+
+		price := float32(tokens) * pricePerTokenValueFunc(m)
+		convert, err := p.converter.Convert(CurrencyAmount(price), m.Currency, userCurrency)
+		if err != nil {
+			return 0.0, fmt.Errorf("failed to convert price from %s to %s: %w", m.Currency, userCurrency, err)
+		}
+
+		return float32(convert), nil
 	}
+
 	return 0.0, fmt.Errorf("unknown model %s", model)
 }
