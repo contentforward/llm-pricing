@@ -1,3 +1,3 @@
-module github.com/ignastech/llm-pricing
+module github.com/contentforward/llm-pricing
 
 go 1.20
