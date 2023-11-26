@@ -4,49 +4,59 @@ package llm_pricing
 type Model struct {
 	Provider    string  `json:"provider"`
 	Model       string  `json:"model"`
-	PriceQuery  float64 `json:"price_query"`
-	PriceOutput float64 `json:"price_output"`
+	PriceQuery  float32 `json:"price_query"`
+	PriceOutput float32 `json:"price_output"`
 }
 
-// OpenAIModels is a list of models from OpenAI
-var OpenAIModels = []Model{
-	{
-		Provider:    "openai",
-		Model:       "gpt-4-1106-preview",
-		PriceQuery:  0.01,
-		PriceOutput: 0.03,
-	},
-	{
-		Provider:    "openai",
-		Model:       "gpt-4-1106-vision-preview",
-		PriceQuery:  0.01,
-		PriceOutput: 0.03,
-	},
-	{
-		Provider:    "openai",
-		Model:       "gpt-4",
-		PriceQuery:  0.03,
-		PriceOutput: 0.06,
-	},
-	{
-		Provider:    "openai",
-		Model:       "gpt-4-32k",
-		PriceQuery:  0.06,
-		PriceOutput: 0.12,
-	},
-	{
-		Provider:    "openai",
-		Model:       "gpt-3.5-turbo-1106",
-		PriceQuery:  0.0010,
-		PriceOutput: 0.0020,
-	},
-	{
-		Provider:    "openai",
-		Model:       "gpt-3.5-turbo-instruct",
-		PriceQuery:  0.0015,
-		PriceOutput: 0.0020,
-	},
+// Price is an interface for model price calculation
+type Price interface {
+	ForModelQuery(provider, model string, currency string, tokens int) float32
+	ForModelOutput(provider, model string, currency string, tokens int) float32
 }
 
-// Models is a list of available models with price
-var Models = OpenAIModels
+// Pricing is a list of models with price
+type Pricing struct {
+	models          []Model
+	defaultCurrency string
+	currencyRates   map[string]float32
+}
+
+var _ Price = (*Pricing)(nil)
+
+// NewPricing returns a new pricing
+func NewPricing(models []Model, defaultCurrency string, currencyRates map[string]float32) *Pricing {
+	return &Pricing{
+		models:          models,
+		defaultCurrency: defaultCurrency,
+		currencyRates:   currencyRates,
+	}
+}
+
+// ForModelQuery returns the price for a model query
+func (p *Pricing) ForModelQuery(provider, model string, currency string, tokens int) float32 {
+	for _, m := range p.models {
+		if m.Provider == provider && m.Model == model {
+			f, ok := p.currencyRates[currency]
+			if !ok {
+				f = p.currencyRates[p.defaultCurrency]
+			}
+			return m.PriceQuery * float32(tokens) * f
+		}
+	}
+
+	return 0.0
+}
+
+// ForModelOutput returns the price for a model output
+func (p *Pricing) ForModelOutput(provider, model string, currency string, tokens int) float32 {
+	for _, m := range p.models {
+		if m.Provider == provider && m.Model == model {
+			f, ok := p.currencyRates[currency]
+			if !ok {
+				f = p.currencyRates[p.defaultCurrency]
+			}
+			return m.PriceOutput * float32(tokens) * f
+		}
+	}
+	return 0.0
+}
