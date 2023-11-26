@@ -1,6 +1,7 @@
 package llm_pricing
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -78,7 +79,8 @@ func Test_USD_Model_Pricing_ForModelQuery(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(testProvider+"_"+tt.model, func(t *testing.T) {
+		name := fmt.Sprintf("%s_%s_%s_%d", testProvider, tt.model, tt.currency, tt.tokens)
+		t.Run(name, func(t *testing.T) {
 			actual, err := price.ForModelQuery(testProvider, tt.model, tt.currency, tt.tokens)
 			assert.NoError(t, err)
 
@@ -123,7 +125,8 @@ func Test_USD_Model_Pricing_ForModelOutput(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(testProvider+"_"+tt.model, func(t *testing.T) {
+		name := fmt.Sprintf("%s_%s_%s_%d", testProvider, tt.model, tt.currency, tt.tokens)
+		t.Run(name, func(t *testing.T) {
 			actual, err := price.ForModelOutput(testProvider, tt.model, tt.currency, tt.tokens)
 			assert.NoError(t, err)
 
