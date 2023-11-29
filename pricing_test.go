@@ -34,6 +34,13 @@ var testModelsUSD = []Model{
 		PriceQuery:  0.1 / 1000,
 		PriceOutput: 0.2 / 1000,
 	},
+	{
+		Provider:    testProvider,
+		Model:       "gpt-4",
+		Currency:    CurrencyUSD,
+		PriceQuery:  0.03 / 1000,
+		PriceOutput: 0.06 / 1000,
+	},
 }
 
 var converter = &Conversion{
@@ -75,6 +82,34 @@ func Test_USD_Model_Pricing_ForModelQuery(t *testing.T) {
 			currency:       CurrencyEUR,
 			expected:       4.5746183,
 			expectedOutput: "€4.5746",
+		},
+		{
+			model:          "gpt-4",
+			tokens:         1,
+			currency:       CurrencyUSD,
+			expected:       0.00003,
+			expectedOutput: "$0.0000",
+		},
+		{
+			model:          "gpt-4",
+			tokens:         1,
+			currency:       CurrencyEUR,
+			expected:       0.00002744771,
+			expectedOutput: "€0.0000",
+		},
+		{
+			model:          "gpt-4",
+			tokens:         20,
+			currency:       CurrencyUSD,
+			expected:       0.00059999997,
+			expectedOutput: "$0.0006",
+		},
+		{
+			model:          "gpt-4",
+			tokens:         20,
+			currency:       CurrencyEUR,
+			expected:       0.0005489542,
+			expectedOutput: "€0.0005",
 		},
 	}
 
@@ -121,6 +156,34 @@ func Test_USD_Model_Pricing_ForModelOutput(t *testing.T) {
 			currency:       CurrencyEUR,
 			expected:       9.149237,
 			expectedOutput: "€9.1492",
+		},
+		{
+			model:          "gpt-4",
+			tokens:         1,
+			currency:       CurrencyUSD,
+			expected:       0.00006,
+			expectedOutput: "$0.0001",
+		},
+		{
+			model:          "gpt-4",
+			tokens:         1,
+			currency:       CurrencyEUR,
+			expected:       0.00005489542,
+			expectedOutput: "€0.0001",
+		},
+		{
+			model:          "gpt-4",
+			tokens:         9,
+			currency:       CurrencyUSD,
+			expected:       0.00054,
+			expectedOutput: "$0.0005",
+		},
+		{
+			model:          "gpt-4",
+			tokens:         9,
+			currency:       CurrencyEUR,
+			expected:       0.00049405877,
+			expectedOutput: "€0.0005",
 		},
 	}
 
