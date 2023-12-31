@@ -34,13 +34,13 @@ func FormatPrice(price float32, currency string) string {
 // Pricing is a list of models with price
 type Pricing struct {
 	models    []Model
-	converter Converter
+	converter CurrencyConversion
 }
 
 var _ Price = (*Pricing)(nil)
 
 // NewPricing returns a new pricing
-func NewPricing(models []Model, converter Converter) *Pricing {
+func NewPricing(models []Model, converter CurrencyConversion) *Pricing {
 	return &Pricing{
 		models:    models,
 		converter: converter,

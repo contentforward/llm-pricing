@@ -5,21 +5,21 @@ import "fmt"
 // CurrencyAmount represents the amount of currency as a float32 to maintain precision.
 type CurrencyAmount float32
 
-// Converter defines the methods that any type of currency converter must implement.
-type Converter interface {
+// CurrencyConversion defines the methods that any type of currency converter must implement.
+type CurrencyConversion interface {
 	Convert(amount CurrencyAmount, fromCurrency, toCurrency string) (CurrencyAmount, error)
 }
 
-// Conversion holds the conversion rates and scale factors for different currencies.
-type Conversion struct {
+// Converter holds the conversion rates and scale factors for different currencies.
+type Converter struct {
 	baseCurrency string
 	rates        map[string]CurrencyAmount // rates are scaled up to preserve precision
 }
 
-// NewConversion initializes a new Conversion struct with default rates.
+// NewConverter initializes a new Converter struct with default rates.
 // In a real-world application, you might fetch these rates from a financial API service.
-func NewConversion(baseCurrency string, rates map[string]CurrencyAmount) *Conversion {
-	return &Conversion{
+func NewConverter(baseCurrency string, rates map[string]CurrencyAmount) *Converter {
+	return &Converter{
 		baseCurrency: baseCurrency,
 		rates:        rates,
 	}
@@ -27,7 +27,7 @@ func NewConversion(baseCurrency string, rates map[string]CurrencyAmount) *Conver
 
 // Convert takes an amount in a source currency and converts it to the target currency.
 // It returns the converted amount in the target currency.
-func (c *Conversion) Convert(amount CurrencyAmount, fromCurrency, toCurrency string) (CurrencyAmount, error) {
+func (c *Converter) Convert(amount CurrencyAmount, fromCurrency, toCurrency string) (CurrencyAmount, error) {
 	// If the source and target currencies are the same, return the amount as is.
 	if fromCurrency == toCurrency {
 		return amount, nil
@@ -50,7 +50,7 @@ func (c *Conversion) Convert(amount CurrencyAmount, fromCurrency, toCurrency str
 }
 
 // convertToBase is a helper function that converts an amount to the base currency.
-func (c *Conversion) convertToBase(amount CurrencyAmount, currency string) (CurrencyAmount, error) {
+func (c *Converter) convertToBase(amount CurrencyAmount, currency string) (CurrencyAmount, error) {
 	if currency == c.baseCurrency {
 		return amount, nil
 	}

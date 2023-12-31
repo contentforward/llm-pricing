@@ -43,7 +43,7 @@ var testModelsUSD = []Model{
 	},
 }
 
-var converter = &Conversion{
+var converter = &Converter{
 	CurrencyUSD,
 	map[string]CurrencyAmount{
 		CurrencyUSD: 1,
