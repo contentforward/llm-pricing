@@ -4,14 +4,7 @@ package llm_pricing
 var OpenAI = []Model{
 	{
 		Provider:    "openai",
-		Model:       "gpt-4-1106-preview",
-		Currency:    CurrencyUSD,
-		PriceQuery:  0.01 / 1000,
-		PriceOutput: 0.03 / 1000,
-	},
-	{
-		Provider:    "openai",
-		Model:       "gpt-4-1106-vision-preview",
+		Model:       "gpt-4-0125-preview",
 		Currency:    CurrencyUSD,
 		PriceQuery:  0.01 / 1000,
 		PriceOutput: 0.03 / 1000,
@@ -32,7 +25,7 @@ var OpenAI = []Model{
 	},
 	{
 		Provider:    "openai",
-		Model:       "gpt-3.5-turbo-1106",
+		Model:       "gpt-3.5-turbo-0125",
 		Currency:    CurrencyUSD,
 		PriceQuery:  0.0010 / 1000,
 		PriceOutput: 0.0020 / 1000,
