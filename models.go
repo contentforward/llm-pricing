@@ -1,41 +1,77 @@
 package llm_pricing
 
-// OpenAI is a list of models from OpenAI
+// OpenAI is a list of OpenAI models with price
+// last updated: 2024-06-23
 var OpenAI = []Model{
 	{
 		Provider:    "openai",
-		Model:       "gpt-4-0125-preview",
+		Model:       "gpt-4o",
+		Releases:    []string{"2024-05-13", "*"},
 		Currency:    CurrencyUSD,
-		PriceQuery:  0.01 / 1000,
-		PriceOutput: 0.03 / 1000,
+		PriceQuery:  0.00500 / 1000,
+		PriceOutput: 0.01500 / 1000,
+	},
+	{
+		Provider:    "openai",
+		Model:       "gpt-4-turbo",
+		Releases:    []string{"2024-04-09", "instruct"},
+		Currency:    CurrencyUSD,
+		PriceQuery:  0.01000 / 1000,
+		PriceOutput: 0.03000 / 1000,
 	},
 	{
 		Provider:    "openai",
 		Model:       "gpt-4",
 		Currency:    CurrencyUSD,
-		PriceQuery:  0.03 / 1000,
-		PriceOutput: 0.06 / 1000,
+		PriceQuery:  0.03000 / 1000,
+		PriceOutput: 0.06000 / 1000,
 	},
 	{
 		Provider:    "openai",
 		Model:       "gpt-4-32k",
 		Currency:    CurrencyUSD,
-		PriceQuery:  0.06 / 1000,
-		PriceOutput: 0.12 / 1000,
+		PriceQuery:  0.06000 / 1000,
+		PriceOutput: 0.12000 / 1000,
 	},
 	{
 		Provider:    "openai",
-		Model:       "gpt-3.5-turbo-0125",
+		Model:       "gpt-4",
+		Releases:    []string{"0125", "0125-preview", "1106-preview", "vision-preview"},
 		Currency:    CurrencyUSD,
-		PriceQuery:  0.0010 / 1000,
-		PriceOutput: 0.0020 / 1000,
+		PriceQuery:  0.01000 / 1000,
+		PriceOutput: 0.03000 / 1000,
 	},
 	{
 		Provider:    "openai",
-		Model:       "gpt-3.5-turbo-instruct",
+		Model:       "gpt-3.5-turbo",
+		Releases:    []string{"1106"},
 		Currency:    CurrencyUSD,
-		PriceQuery:  0.0015 / 1000,
-		PriceOutput: 0.0020 / 1000,
+		PriceQuery:  0.00100 / 1000,
+		PriceOutput: 0.00200 / 1000,
+	},
+	{
+		Provider:    "openai",
+		Model:       "gpt-3.5-turbo",
+		Releases:    []string{"0613"},
+		Currency:    CurrencyUSD,
+		PriceQuery:  0.00150 / 1000,
+		PriceOutput: 0.00200 / 1000,
+	},
+	{
+		Provider:    "openai",
+		Model:       "gpt-3.5-turbo",
+		Releases:    []string{"16k-0613"},
+		Currency:    CurrencyUSD,
+		PriceQuery:  0.00300 / 1000,
+		PriceOutput: 0.00400 / 1000,
+	},
+	{
+		Provider:    "openai",
+		Model:       "gpt-3.5-turbo",
+		Releases:    []string{"0301"},
+		Currency:    CurrencyUSD,
+		PriceQuery:  0.00150 / 1000,
+		PriceOutput: 0.00200 / 1000,
 	},
 }
 

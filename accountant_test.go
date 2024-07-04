@@ -52,7 +52,7 @@ var converter = &Converter{
 }
 
 func Test_USD_Model_Pricing_ForModelQuery(t *testing.T) {
-	price := NewPricing(testModelsUSD, converter)
+	price := NewAccountant(testModelsUSD, converter)
 
 	tests := []test{
 		{
@@ -126,7 +126,7 @@ func Test_USD_Model_Pricing_ForModelQuery(t *testing.T) {
 }
 
 func Test_USD_Model_Pricing_ForModelOutput(t *testing.T) {
-	price := NewPricing(testModelsUSD, converter)
+	price := NewAccountant(testModelsUSD, converter)
 
 	tests := []test{
 		{
