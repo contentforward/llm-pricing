@@ -125,6 +125,18 @@ func Test_USD_Model_Pricing_ForModelQuery(t *testing.T) {
 	}
 }
 
+// FormatPrice formats a price with currency
+func FormatPrice(price float32, currency string) string {
+	switch currency {
+	case CurrencyUSD:
+		return fmt.Sprintf("$%.4f", price)
+	case CurrencyEUR:
+		return fmt.Sprintf("€%.4f", price)
+	default:
+		return fmt.Sprintf("%.4f", price)
+	}
+}
+
 func Test_USD_Model_Pricing_ForModelOutput(t *testing.T) {
 	price := NewAccountant(testModelsUSD, converter)
 

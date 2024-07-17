@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/pkoukk/tiktoken-go v0.1.7
-	github.com/pkoukk/tiktoken-go-loader v0.0.1
+	github.com/pkoukk/tiktoken-go-loader v0.0.2-0.20240522064338-c17e8bc0f699
 	github.com/stretchr/testify v1.8.4
 )
 

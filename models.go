@@ -14,7 +14,7 @@ var OpenAI = []Model{
 	{
 		Provider:    "openai",
 		Model:       "gpt-4-turbo",
-		Releases:    []string{"2024-04-09", "instruct"},
+		Releases:    []string{"2024-04-09", "instruct", "*"},
 		Currency:    CurrencyUSD,
 		PriceQuery:  0.01000 / 1000,
 		PriceOutput: 0.03000 / 1000,
@@ -40,6 +40,28 @@ var OpenAI = []Model{
 		Currency:    CurrencyUSD,
 		PriceQuery:  0.01000 / 1000,
 		PriceOutput: 0.03000 / 1000,
+	},
+	{
+		Provider:    "openai",
+		Model:       "gpt-3.5-turbo",
+		Currency:    CurrencyUSD,
+		PriceQuery:  0.00050 / 1000,
+		PriceOutput: 0.00150 / 1000,
+	},
+	{
+		Provider:    "openai",
+		Model:       "gpt-3.5-turbo",
+		Releases:    []string{"0125"},
+		Currency:    CurrencyUSD,
+		PriceQuery:  0.00050 / 1000,
+		PriceOutput: 0.00150 / 1000,
+	},
+	{
+		Provider:    "openai",
+		Model:       "gpt-3.5-turbo-instruct",
+		Currency:    CurrencyUSD,
+		PriceQuery:  0.00150 / 1000,
+		PriceOutput: 0.00200 / 1000,
 	},
 	{
 		Provider:    "openai",

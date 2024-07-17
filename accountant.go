@@ -2,6 +2,7 @@ package llm_pricing
 
 import (
 	"fmt"
+	"log"
 	"strings"
 
 	"github.com/pkoukk/tiktoken-go"
@@ -34,17 +35,8 @@ type Accountant interface {
 	Models() []Model
 }
 
-// FormatPrice formats a price with currency
-func FormatPrice(price float32, currency string) string {
-	switch currency {
-	case CurrencyUSD:
-		return fmt.Sprintf("$%.4f", price)
-	case CurrencyEUR:
-		return fmt.Sprintf("€%.4f", price)
-	default:
-		return fmt.Sprintf("%.4f", price)
-	}
-}
+var ErrPricingModelNotFound = fmt.Errorf("model not supported")
+var ErrTokenizerNotFound = fmt.Errorf("tokenizer not found")
 
 // Counter is a pricing calculator
 type Counter struct {
@@ -58,10 +50,14 @@ var _ Accountant = (*Counter)(nil)
 func NewAccountant(models []Model, converter CurrencyConversion, bpe bool) *Counter {
 	// TODO: we may need a way to reset this
 	if bpe {
-		tiktoken.SetBpeLoader(tiktokenloader.NewOfflineLoader())
+		log.Printf("setting offline bpe loader")
+		loader := tiktokenloader.NewOfflineLoader()
+		tiktoken.SetBpeLoader(loader)
 	} else {
+		log.Printf("setting nil bpe loader")
 		tiktoken.SetBpeLoader(nil)
 	}
+
 	return &Counter{
 		models:    models,
 		converter: converter,
@@ -77,8 +73,12 @@ func (p *Counter) Models() []Model {
 func (p *Counter) TokenCount(provider, model string, content string) (int, error) {
 	tkm, err := tiktoken.EncodingForModel(model)
 	if err != nil {
-		err = fmt.Errorf("failed to get encoding for model %s: %w", model, err)
-		return 0, err
+		// no encoding for model
+		if strings.Contains(err.Error(), "no encoding for model") {
+			return 0, fmt.Errorf("%w: %w", err, ErrTokenizerNotFound)
+		}
+
+		return 0, fmt.Errorf("failed to get encoding for model %s: %w", model, err)
 	}
 	tokens := len(tkm.Encode(content, nil, nil))
 	return tokens, nil
@@ -88,7 +88,7 @@ func (p *Counter) TokenCount(provider, model string, content string) (int, error
 func (p *Counter) PriceForModelQuery(provider, model string, userCurrency string, tokens int) (float32, error) {
 	pricingModel := p.findModel(provider, model)
 	if pricingModel == nil {
-		return 0.0, fmt.Errorf("unknown model %s", model)
+		return 0.0, fmt.Errorf("failed to find model for query price %s: %w", model, ErrPricingModelNotFound)
 	}
 
 	price, err := p.calculateCost(tokens, pricingModel.PriceQuery, userCurrency, pricingModel.Currency)
@@ -103,7 +103,7 @@ func (p *Counter) PriceForModelQuery(provider, model string, userCurrency string
 func (p *Counter) PriceForModelOutput(provider, model string, userCurrency string, tokens int) (float32, error) {
 	pricingModel := p.findModel(provider, model)
 	if pricingModel == nil {
-		return 0.0, fmt.Errorf("unknown model %s", model)
+		return 0.0, fmt.Errorf("failed to find model for output price %s: %w", model, ErrPricingModelNotFound)
 	}
 
 	price, err := p.calculateCost(tokens, pricingModel.PriceOutput, userCurrency, pricingModel.Currency)
@@ -133,6 +133,7 @@ func (p *Counter) findModel(provider, model string) *Model {
 		}
 
 		if p.matchModelRelease(model, m) {
+			// log.Printf("matched model by release")
 			mod = &m
 			break
 		}
@@ -148,9 +149,13 @@ func (p *Counter) findModel(provider, model string) *Model {
 func (p *Counter) matchModelRelease(givenModel string, model Model) bool {
 	// make sure the given model starts with the base model
 	// "gpt-4-0125-preview", "gpt-4"
+	// log.Printf("givenModel: %s, model.Model: %s", givenModel, model.Model)
 	if !strings.HasPrefix(givenModel, model.Model) {
+		// log.Printf("model does not start with base model")
 		return false
 	}
+	// log.Printf("model found: %s", model.Model)
+	// log.Printf("model releases: %v", model.Releases)
 
 	// * means any release in consecutive release order
 	// e.g. gpt-4-0125-preview, gpt-4-0125, gpt-4-1106-preview
