@@ -3,7 +3,7 @@ package llm_pricing
 import "fmt"
 
 // CurrencyAmount represents the amount of currency as a float32 to maintain precision.
-type CurrencyAmount float32
+type CurrencyAmount float64
 
 // CurrencyConversion defines the methods that any type of currency converter must implement.
 type CurrencyConversion interface {
